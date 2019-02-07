@@ -1,0 +1,10 @@
+apply plugin: 'java'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'junit:junit:4.13-beta-2'
+    implementation 'org.seleniumhq.selenium:selenium-java:3.141.59'
+}
