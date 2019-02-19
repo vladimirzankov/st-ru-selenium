@@ -6,9 +6,10 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.*;
 
 public class Tests {
 
@@ -104,6 +105,50 @@ public class Tests {
 			Collections.sort(sortedZones);
 			Assert.assertTrue(zones.equals(sortedZones));
 			driver.navigate().back();
+		}
+	}
+
+	@Test
+	public void productInfoTest() {
+
+		driver.get("http://localhost:8088/litecart");
+		WebElement element = driver.findElement(By.id("box-campaigns")).findElement(By.tagName("li"));
+		ArrayList<ProductInfo> infos = new ArrayList<>();
+		ProductInfoCard card = new ProductInfoCard();
+		card.name = element.findElement(By.className("name")).getText();
+		card.regularPrice = element.findElement(By.className("regular-price")).getText();
+		card.campaignPrice = element.findElement(By.className("campaign-price")).getText();
+		card.isRegularPriceCrossedOut = element.findElements(By.cssSelector("s.regular-price")).size() > 0;
+		card.regularPriceColor = element.findElement(By.className("regular-price")).getCssValue("color");
+		card.campaignPriceFontWeight = Integer.parseInt(element.findElement(By.className("campaign-price")).getCssValue("font-weight"));
+		card.campaignPriceColor = element.findElement(By.className("campaign-price")).getCssValue("color");
+		card.setRegularPriceFontSize(element.findElement(By.className("regular-price")).getCssValue("font-size"));
+		card.setCampaignPriceFontSize(element.findElement(By.className("campaign-price")).getCssValue("font-size"));
+		infos.add(card);
+
+		element.click();
+
+		ProductInfoPage page = new ProductInfoPage();
+		page.name = driver.findElement(By.tagName("h1")).getText();
+		page.regularPrice = driver.findElement(By.className("regular-price")).getText();
+		page.campaignPrice = driver.findElement(By.className("campaign-price")).getText();
+		page.isRegularPriceCrossedOut = driver.findElements(By.cssSelector("s.regular-price")).size() > 0;
+		page.regularPriceColor = driver.findElement(By.className("regular-price")).getCssValue("color");
+		page.campaignPriceFontWeight = Integer.parseInt(driver.findElement(By.className("campaign-price")).getCssValue("font-weight"));
+		page.campaignPriceColor = driver.findElement(By.className("campaign-price")).getCssValue("color");
+		page.setRegularPriceFontSize(driver.findElement(By.className("regular-price")).getCssValue("font-size"));
+		page.setCampaignPriceFontSize(driver.findElement(By.className("campaign-price")).getCssValue("font-size"));
+		infos.add(page);
+
+		Assert.assertTrue(card.name.equals(page.name));
+		Assert.assertTrue(card.regularPrice.equals(page.regularPrice));
+		Assert.assertTrue(card.campaignPrice.equals(page.campaignPrice));
+		for(ProductInfo info : infos) {
+			Assert.assertTrue(info.isRegularPriceCrossedOut);
+			Assert.assertTrue(info.isRegularPriceGrey());
+			Assert.assertTrue(info.isCampaignPriceRed());
+			Assert.assertTrue(info.isCampaignPriceBold(driver));
+			Assert.assertTrue(info.campaignPriceFontSize > info.regularPriceFontSize);
 		}
 	}
 
