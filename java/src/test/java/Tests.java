@@ -234,6 +234,28 @@ public class Tests {
 		}
 	}
 
+	@Test
+	public void externalLinksTest() {
+		driver.get("http://localhost:8088/litecart/admin");
+		driver.findElement(By.name("username")).sendKeys("admin");
+		driver.findElement(By.name("password")).sendKeys("admin");
+		driver.findElement(By.name("login")).click();
+		driver.findElement(By.xpath("//span[@class='name' and contains(., 'Countries')]")).click();
+		driver.findElement(By.xpath("//a[contains(., ' Add New Country')]")).click();
+		Set<String> initialWindows = driver.getWindowHandles();
+		List<WebElement> links = driver.findElements(By.cssSelector(".fa.fa-external-link"));
+		for(WebElement element : links) {
+			element.click();
+			wait.until(ExpectedConditions.numberOfWindowsToBe(initialWindows.size() + 1));
+			Set<String> currentWindows = driver.getWindowHandles();
+			currentWindows.removeAll(initialWindows);
+			driver.switchTo().window(currentWindows.iterator().next());
+			driver.close();
+			driver.switchTo().window(initialWindows.iterator().next());
+		}
+		driver.quit();
+	}
+
 	@After
 	public void stop() {
 		driver.quit();
