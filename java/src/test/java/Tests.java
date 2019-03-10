@@ -6,6 +6,7 @@ import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.ie.InternetExplorerDriver;
+import org.openqa.selenium.logging.LogEntry;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -253,7 +254,27 @@ public class Tests {
 			driver.close();
 			driver.switchTo().window(initialWindows.iterator().next());
 		}
-		driver.quit();
+	}
+
+	@Test
+	public void logEntriesTest() {
+		driver.get("http://localhost:8088/litecart/admin");
+		driver.findElement(By.name("username")).sendKeys("admin");
+		driver.findElement(By.name("password")).sendKeys("admin");
+		driver.findElement(By.name("login")).click();
+		driver.findElement(By.xpath("//li[@id='app-']//span[contains(., 'Catalog')]")).click();
+		driver.findElement(By.xpath("//a[contains(., 'Rubber Ducks')]")).click();
+		List<WebElement> rows = driver.findElements(By.xpath("//tr[contains(@class, 'row')][not(.//i[contains(@class, 'fa-folder')])]"));
+		List<String> products = new ArrayList<>();
+		for(WebElement r : rows) {
+			products.add(r.getText());
+		}
+		List<LogEntry> messages = new ArrayList<>();
+		for(String p : products) {
+			driver.findElement(By.xpath("//tr[contains(@class, 'row')]//a[contains(., '" + p + "')]")).click();
+			driver.navigate().back();
+			Assert.assertTrue(driver.manage().logs().get("browser").getAll().size() == 0);
+		}
 	}
 
 	@After
